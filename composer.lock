@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8f387a0734f3bf879214e4aa2fca6e2f",
+    "content-hash": "e9a3d9fcfa44cb1c15c60a8d815e9347",
     "packages": [
         {
             "name": "brick/math",
@@ -2081,6 +2081,51 @@
                 }
             ],
             "time": "2025-12-07T16:03:21+00:00"
+        },
+        {
+            "name": "lucianotonet/groq-php",
+            "version": "v1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lucianotonet/groq-php.git",
+                "reference": "326bf74ac4dabbf0c2e2ad2bc45fce8791e86c13"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lucianotonet/groq-php/zipball/326bf74ac4dabbf0c2e2ad2bc45fce8791e86c13",
+                "reference": "326bf74ac4dabbf0c2e2ad2bc45fce8791e86c13",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^7.9",
+                "php": "^8.1.0",
+                "vlucas/phpdotenv": "^5.6"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.3"
+            },
+            "type": "package",
+            "autoload": {
+                "psr-4": {
+                    "LucianoTonet\\GroqPHP\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Luciano Tonet",
+                    "email": "tonetlds@gmail.com"
+                }
+            ],
+            "description": "A powerful PHP library for seamless integration with the GroqCloud API",
+            "support": {
+                "issues": "https://github.com/lucianotonet/groq-php/issues",
+                "source": "https://github.com/lucianotonet/groq-php/tree/v1.3.0"
+            },
+            "time": "2025-06-03T20:28:50+00:00"
         },
         {
             "name": "monolog/monolog",

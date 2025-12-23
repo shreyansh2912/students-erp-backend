@@ -23,8 +23,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Public routes
-Route::post('/login', [AuthController::class, 'login'])->name('login');
-Route::post('/invitations/{token}/accept', [OrganizationController::class, 'acceptInvitation'])->name('invitations.accept');
+Route::post('/login', [AuthController::class, 'login'])
+    ->middleware('throttle:login')
+    ->name('login');
+Route::post('/invitations/{token}/accept', [OrganizationController::class, 'acceptInvitation'])
+    ->middleware('throttle:invitations')
+    ->name('invitations.accept');
 
 // Protected routes (require authentication)
 Route::middleware('auth:sanctum')->group(function () {
@@ -97,6 +101,19 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/{exam}/answers', [StudentExamController::class, 'saveAnswer'])->name('save-answer'); // Save answer
         Route::post('/{exam}/submit', [StudentExamController::class, 'submit'])->name('submit'); // Submit exam
     });
+
+    // AI routes (teachers and admins only)
+    Route::prefix('ai')
+        ->middleware(EnsureUserHasRole::class . ':admin,teacher')
+        ->name('ai.')
+        ->group(function () {
+            Route::post('/generate-questions', [App\Http\Controllers\Api\AIController::class, 'generateQuestions'])
+                ->name('generate-questions');
+            Route::post('/questions/{question}/refine', [App\Http\Controllers\Api\AIController::class, 'refineQuestion'])
+                ->name('refine-question');
+            Route::post('/generate-options', [App\Http\Controllers\Api\AIController::class, 'generateOptions'])
+                ->name('generate-options');
+        });
 
     // Result routes
     Route::prefix('results')->name('results.')->group(function () {
