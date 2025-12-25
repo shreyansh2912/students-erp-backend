@@ -4,6 +4,8 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BatchController;
 use App\Http\Controllers\Api\ExamController;
 use App\Http\Controllers\Api\OrganizationController;
+use App\Http\Controllers\Api\QuestionController;
+use App\Http\Controllers\Api\QuestionPaperController;
 use App\Http\Controllers\Api\ResultController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\StudentExamController;
@@ -81,6 +83,24 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/{batch}/students', [BatchController::class, 'addStudent'])->name('add-student');
             Route::delete('/{batch}/students', [BatchController::class, 'removeStudent'])->name('remove-student');
         });
+    });
+
+    // Question Paper routes (teachers only)
+    Route::prefix('question-papers')->middleware(EnsureUserHasRole::class . ':admin,teacher')->name('papers.')->group(function () {
+        Route::get('/', [QuestionPaperController::class, 'index'])->name('index');
+        Route::post('/', [QuestionPaperController::class, 'store'])->name('store');
+        Route::get('/{paper}', [QuestionPaperController::class, 'show'])->name('show');
+        Route::put('/{paper}', [QuestionPaperController::class, 'update'])->name('update');
+        Route::delete('/{paper}', [QuestionPaperController::class, 'destroy'])->name('destroy');
+    });
+
+    // Questions routes (teachers only)
+    Route::prefix('questions')->middleware(EnsureUserHasRole::class . ':admin,teacher')->name('questions.')->group(function () {
+        Route::get('/paper/{paper}', [QuestionController::class, 'index'])->name('index');
+        Route::post('/', [QuestionController::class, 'store'])->name('store');
+        Route::get('/{question}', [QuestionController::class, 'show'])->name('show');
+        Route::put('/{question}', [QuestionController::class, 'update'])->name('update');
+        Route::delete('/{question}', [QuestionController::class, 'destroy'])->name('destroy');
     });
 
     // Exam routes (teachers only)

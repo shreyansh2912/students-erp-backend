@@ -23,6 +23,12 @@ Production-grade Laravel 12 backend for an exam-first education platform used by
 - Subject-based grouping
 - Attendance tracking
 
+### ✅ Question Paper & Question Management
+- **Create reusable question papers** with title and subject
+- **Add MCQ and short answer questions** to papers
+- **Question options** with correct answer marking
+- **Locked paper protection**: Papers cannot be edited once linked to published exam
+
 ### ✅ Exam System
 - **Reusable question papers** (MCQ & short answer)
 - **Time-bound exams** (start_time → end_time)
@@ -157,6 +163,26 @@ PUT    /api/batches/{id}                     # Update batch
 DELETE /api/batches/{id}                     # Delete batch
 POST   /api/batches/{id}/students            # Add student to batch
 DELETE /api/batches/{id}/students            # Remove student from batch
+```
+
+###Question Papers (Teachers)
+
+```
+GET    /api/question-papers                  # List question papers
+POST   /api/question-papers                  # Create question paper
+GET    /api/question-papers/{id}             # Get question paper with questions
+PUT    /api/question-papers/{id}             # Update (if not locked)
+DELETE /api/question-papers/{id}             # Delete (if not locked)
+```
+
+### Questions (Teachers)
+
+```
+GET    /api/questions/paper/{paper_id}       # List questions in a paper
+POST   /api/questions                        # Add question to paper
+GET    /api/questions/{id}                   # Get question details
+PUT    /api/questions/{id}                   # Update question (if paper not locked)
+DELETE /api/questions/{id}                   # Delete question (if paper not locked)
 ```
 
 ### Exams (Teachers)
