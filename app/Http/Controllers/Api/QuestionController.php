@@ -26,14 +26,11 @@ class QuestionController extends Controller
     {
         $questions = $paper->questions()->with('options')->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'paper' => $paper,
-                'questions' => $questions,
-                'total_questions' => $questions->count(),
-                'total_marks' => $questions->sum('marks'),
-            ],
+        return apiSuccess([
+            'paper' => $paper,
+            'questions' => $questions,
+            'total_questions' => $questions->count(),
+            'total_marks' => $questions->sum('marks'),
         ]);
     }
 
@@ -45,16 +42,13 @@ class QuestionController extends Controller
         try {
             $question = $this->questionService->createQuestion($request->validated());
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Question created successfully',
-                'data' => $question,
-            ], 201);
+            return apiSuccess(
+                $question,
+                'Question created successfully',
+                201
+            );
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 400);
+            return apiError($e->getMessage());
         }
     }
 
@@ -65,10 +59,7 @@ class QuestionController extends Controller
     {
         $question->load(['options', 'paper']);
 
-        return response()->json([
-            'success' => true,
-            'data' => $question,
-        ]);
+        return apiSuccess($question);
     }
 
     /**
@@ -80,16 +71,12 @@ class QuestionController extends Controller
         try {
             $updated = $this->questionService->updateQuestion($question, $request->validated());
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Question updated successfully',
-                'data' => $updated,
-            ]);
+            return apiSuccess(
+                $updated,
+                'Question updated successfully'
+            );
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 400);
+            return apiError($e->getMessage());
         }
     }
 
@@ -102,15 +89,9 @@ class QuestionController extends Controller
         try {
             $this->questionService->deleteQuestion($question);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Question deleted successfully',
-            ]);
+            return apiSuccess(null, 'Question deleted successfully');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 400);
+            return apiError($e->getMessage());
         }
     }
 }

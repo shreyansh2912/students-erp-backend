@@ -1,105 +1,192 @@
-# Response Helper Usage
+# API Response Helpers
 
 ## Overview
 
-The `ResponseHelper` provides consistent JSON responses across all API endpoints.
+Standardized helper functions for consistent JSON API responses across all endpoints.
+
+## Location
+
+`app/Helpers/ApiResponse.php`
 
 ## Functions
 
-### `successJson($data, $message, $statusCode)`
+### `apiSuccess($data = null, string $message = 'Operation successful', int $statusCode = 200)`
 
-Returns a success response:
+Returns a standardized success JSON response.
 
-```php
-return successJson($user, 'User created successfully', 201);
-```
+**Parameters:**
+- `$data` (mixed): The data to return (optional)
+- `$message` (string): Success message (default: "Operation successful")
+- `$statusCode` (int): HTTP status code (default: 200)
 
-**Output:**
+**Response Structure:**
 ```json
 {
   "success": true,
-  "message": "User created successfully",
+  "message": "Operation successful",
   "data": { ... }
 }
 ```
 
-### `errorJson($message, $errors, $statusCode)`
-
-Returns an error response:
+**Usage Examples:**
 
 ```php
-return errorJson('Validation failed', $validator->errors(), 422);
+// Simple success with data
+return apiSuccess($user);
+
+// Success with custom message
+return apiSuccess($paper, 'Question paper created successfully');
+
+// Success with data, message, and 201 status
+return apiSuccess($question, 'Question created successfully', 201);
+
+// Success with message only (no data)
+return apiSuccess(null, 'Question deleted successfully');
 ```
 
-**Output:**
+---
+
+### `apiError(string $message = 'An error occurred', int $statusCode = 400, $errors = null)`
+
+Returns a standardized error JSON response.
+
+**Parameters:**
+- `$message` (string): Error message (default: "An error occurred")
+- `$statusCode` (int): HTTP status code (default: 400)
+- `$errors` (mixed): Additional error details like validation errors (optional)
+
+**Response Structure:**
 ```json
 {
   "success": false,
-  "message": "Validation failed",
+  "message": "An error occurred",
   "errors": { ... }
 }
 ```
 
-## Usage Examples
+**Usage Examples:**
 
-### Simple Success
 ```php
-return successJson($students);
-// Default message: "Success", status: 200
+// Simple error
+return apiError('Question paper not found', 404);
+
+// Error with default 400 status
+return apiError($exception->getMessage());
+
+// Error with validation errors
+return apiError('Validation failed', 422, $validator->errors());
 ```
 
-### Success with Custom Message
-```php
-return successJson($exam, 'Exam published successfully');
-```
+---
 
-### Success with Custom Status Code
-```php
-return successJson($student, 'Student created', 201);
-```
+## Before vs After
 
-### Simple Error
-```php
-return errorJson('Student not found', null, 404);
-```
-
-### Error with Validation Errors
-```php
-return errorJson('Invalid input', [
-    'email' => ['Email is required'],
-    'name' => ['Name must be at least 3 characters']
-], 422);
-```
-
-### Error from Exception
-```php
-try {
-    // ... code
-} catch (\Exception $e) {
-    return errorJson($e->getMessage(), null, 400);
-}
-```
-
-## Refactored Controller Example
-
-**Before:**
+### Before (Manual Response)
 ```php
 return response()->json([
     'success' => true,
-    'message' => 'Student created successfully',
-    'data' => $student,
+    'message' => 'Question paper created successfully',
+    'data' => $paper,
 ], 201);
 ```
 
-**After:**
+### After (Using Helper)
 ```php
-return successJson($student, 'Student created successfully', 201);
+return apiSuccess($paper, 'Question paper created successfully', 201);
 ```
+
+---
 
 ## Benefits
 
-✅ **Consistency** - All responses follow the same structure  
-✅ **Less Code** - Shorter, more readable controller methods  
-✅ **Maintainability** - Change format in one place  
-✅ **Type Safety** - Parameters clearly defined  
-✅ **Global Access** - Available everywhere without imports
+✅ **Consistency**: All API endpoints return the same JSON structure  
+✅ **Maintainability**: Single source of truth for response format  
+✅ **Readability**: Cleaner controller code  
+✅ **Type Safety**: Return type hints ensure JsonResponse  
+✅ **Less Code**: Shorter, more concise responses
+
+---
+
+## Standard Response Format
+
+All API responses follow this structure:
+
+**Success Response:**
+```json
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": {
+    // Response data (optional)
+  }
+}
+```
+
+**Error Response:**
+```json
+{
+  "success": false,
+  "message": "Error message",
+  "errors": {
+    // Validation errors or additional error details (optional)
+  }
+}
+```
+
+---
+
+## Usage in Controllers
+
+### Example: QuestionPaperController
+
+```php
+public function store(QuestionPaperRequest $request): JsonResponse
+{
+    try {
+        $paper = $this->paperService->createQuestionPaper($request->validated());
+        
+        return apiSuccess(
+            $paper->load(['creator', 'organization']),
+            'Question paper created successfully',
+            201
+        );
+    } catch (\Exception $e) {
+        return apiError($e->getMessage());
+    }
+}
+
+public function index(Request $request): JsonResponse
+{
+    $papers = QuestionPaper::with(['creator', 'organization'])->get();
+    
+    return apiSuccess($papers);
+}
+
+public function destroy(QuestionPaper $paper): JsonResponse
+{
+    try {
+        $this->paperService->deleteQuestionPaper($paper);
+        
+        return apiSuccess(null, 'Question paper deleted successfully');
+    } catch (\Exception $e) {
+        return apiError($e->getMessage());
+    }
+}
+```
+
+---
+
+## Autoloading
+
+The helper file is automatically loaded via `composer.json`:
+
+```json
+"autoload": {
+    "files": [
+        "app/Helpers/helpers.php",
+        "app/Helpers/ApiResponse.php"
+    ]
+}
+```
+
+After modifying, run: `composer dump-autoload`

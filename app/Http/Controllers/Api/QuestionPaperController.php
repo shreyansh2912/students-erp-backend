@@ -43,10 +43,7 @@ class QuestionPaperController extends Controller
             $paper->question_count = $paper->questions()->count();
         });
 
-        return response()->json([
-            'success' => true,
-            'data' => $papers,
-        ]);
+        return apiSuccess($papers);
     }
 
     /**
@@ -57,16 +54,13 @@ class QuestionPaperController extends Controller
         try {
             $paper = $this->paperService->createQuestionPaper($request->validated());
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Question paper created successfully',
-                'data' => $paper->load(['creator', 'organization']),
-            ], 201);
+            return apiSuccess(
+                $paper->load(['creator', 'organization']),
+                'Question paper created successfully',
+                201
+            );
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 400);
+            return apiError($e->getMessage());
         }
     }
 
@@ -86,10 +80,7 @@ class QuestionPaperController extends Controller
         $paper->question_count = $paper->questions->count();
         $paper->calculated_total_marks = $this->paperService->calculateTotalMarks($paper);
 
-        return response()->json([
-            'success' => true,
-            'data' => $paper,
-        ]);
+        return apiSuccess($paper);
     }
 
     /**
@@ -101,16 +92,12 @@ class QuestionPaperController extends Controller
         try {
             $updated = $this->paperService->updateQuestionPaper($paper, $request->validated());
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Question paper updated successfully',
-                'data' => $updated->load(['creator', 'organization']),
-            ]);
+            return apiSuccess(
+                $updated->load(['creator', 'organization']),
+                'Question paper updated successfully'
+            );
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 400);
+            return apiError($e->getMessage());
         }
     }
 
@@ -123,15 +110,9 @@ class QuestionPaperController extends Controller
         try {
             $this->paperService->deleteQuestionPaper($paper);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Question paper deleted successfully',
-            ]);
+            return apiSuccess(null, 'Question paper deleted successfully');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage(),
-            ], 400);
+            return apiError($e->getMessage());
         }
     }
 }
